@@ -1,0 +1,21 @@
+info:
+  name: get user
+  type: http
+
+http:
+  method: GET
+  url: http://127.0.0.1:5000/api/v1/users
+  body:
+    type: json
+    data: |-
+      {
+        "name": "John Doe",
+        "email": "joe@example.com"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
