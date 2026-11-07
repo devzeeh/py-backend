@@ -134,18 +134,17 @@ def delete_task(task_id):
     """Delete a specific task belonging to the logged-in user"""
     current_user_id = get_jwt_identity()
     
+    # If the task doesn't exist, SQLAlchemy automatically raises a 404 
+    # and our global error handler returns a clean JSON response!
     task = Task.query.get_or_404(task_id)
-
-    # SECURITY CHECK: Ensure ownership before deleting
+    
     if str(task.user_id) != str(current_user_id):
         return jsonify({"error": "Unauthorized: You do not own this task"}), 403
 
     db.session.delete(task)
-    db.session.commit()
+    db.session.commit() 
 
-    return jsonify({
-        "message": "Task deleted successfully"
-    }), 200
+    return jsonify({"message": "Task deleted successfully"}), 200
 
 @api_bp.route("/users", methods=["GET"])
 def get_user():
