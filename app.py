@@ -1,4 +1,6 @@
 from flask import Flask, jsonify
+from flask_jwt_extended import JWTManager
+from flask_migrate import Migrate
 from api.models import db
 from api.routes import api_bp
 
@@ -9,9 +11,14 @@ def create_app():
     # Configure SQLite database file stored locally
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///app.db"
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+    app.config["JWT_SECRET_KEY"] = "super-secret-jwt-key-change-this"
 
     # Initialize extensions with the app
     db.init_app(app)
+    jwt = JWTManager(app) # Initialize JWT manager
+
+    # Initialize Flask-Migrate
+    migrate = Migrate(app, db)
 
     # Create database tables automatically if they don't exist
     with app.app_context():
@@ -21,7 +28,7 @@ def create_app():
     @app.route("/", methods=["GET"])
     def home():
         return jsonify({
-            "message": "Welcome to your Flack backend",
+            "message": "Welcome to your Flask backend",
             "status": "success"
         })
 

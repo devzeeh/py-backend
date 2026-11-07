@@ -1,0 +1,23 @@
+info:
+  name: login
+  type: http
+
+http:
+  method: POST
+  url: http://127.0.0.1:5000/api/v1/login
+  body:
+    type: json
+    data: |-
+      {
+        "email": "alice@example.com",
+        "password": "alice"
+      }
+  auth:
+    type: bearer
+    token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc5NDAyNTkzMiwianRpIjoiNGZmOGZjNGEtYzhiOS00MDNmLThiZDgtNTEyYjIzZmRlMTI0IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjEiLCJuYmYiOjE3OTQwMjU5MzIsImNzcmYiOiI4OTcwOTQxZS03MWFmLTQ2YzAtYTVjZi00ZWExNDBiNjJiYmEiLCJleHAiOjE3OTQwMjY4MzJ9.fUSYzLyV6yX8sN78-ijr-S2uQPM7g0EE99cfhrl4vx8
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

@@ -1,0 +1,16 @@
+info:
+  name: profile
+  type: http
+
+http:
+  method: GET
+  url: http://127.0.0.1:5000/api/v1/profile
+  auth:
+    type: bearer
+    token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc5NDAyNjE5OSwianRpIjoiMDExOTgyOTktMGJlNC00ZGNjLTk5MTAtNmJlOWJmZTQxOTY1IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjEiLCJuYmYiOjE3OTQwMjYxOTksImNzcmYiOiIzNjA4ZTMxNS0yY2YyLTQzYmEtYjhhZi01N2IxODIyM2I2OWEiLCJleHAiOjE3OTQwMjcwOTl9.GzJQ0JpR8V42W75rIqWmaK8o-J2bPCSOrwDSI3PNT48
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
