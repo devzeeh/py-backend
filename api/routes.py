@@ -69,10 +69,40 @@ def get_user_tasks():
     """Fetch only the tasks belonging to the currently logged in"""
     current_user_id = get_jwt_identity()
 
-    # Query tasks filtered by the logged in users id
-    tasks = Task.query.filter_by(user_id=current_user_id).all()
+    # Read query parameters from the URL (With safe defaults)
+    # /api/v1/tasks?page=1&per_page=5
+    page = request.args.get("page", 1, type=int)
+    per_page = request.args.get("per_page", 10, type=int)
 
-    return jsonify([task.to_dict() for task in tasks]), 200
+    # Optional filter: check if user wants only completed or active tasks
+    # Example URL: /api/v1/tasks?done=true
+    done_param = request.args.get("done")
+
+    # Build base query
+    query = Task.query.filter_by(user_id=current_user_id)
+
+    if done_param is not None:
+        # Convert string 'true'/'false' to boolean
+        is_done = done_param.lower() == 'true'
+        query = query.filter_by(done=is_done)
+
+    # Apply pagination using SQLAlchemy .paginate()
+    pagination = query.paginate(page=page, per_page=per_page, error_out=False)
+
+    tasks = pagination.items    
+
+    # Return paginated response with helpful metadata for the frontend
+    return jsonify({
+        "tasks": [task.to_dict() for task in tasks],
+        "pagination": {
+            "total_items": pagination.total,
+            "total_pages": pagination.pages,
+            "current_page": pagination.page,
+            "per_page": pagination.per_page,
+            "has_next": pagination.has_next,
+            "has_prev": pagination.has_prev
+        }
+    }), 200
 
 @api_bp.route("/tasks", methods=["POST"])
 @jwt_required()
