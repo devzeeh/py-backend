@@ -14,7 +14,7 @@ def register():
         return jsonify({"error": "Missing name, email, password"}), 400
 
     if User.query.filter_by(email=data["email"]).first():
-        return jsonify({"error": "Email alreadt registered"}), 400
+        return jsonify({"error": "Email already registered"}), 400
 
     new_user = User(name=data["name"], email=data["email"])
     new_user.set_password(data["password"]) # securely hash password
@@ -23,7 +23,7 @@ def register():
     db.session.commit()
 
     return jsonify({
-        "message": "User registered successfully!", 
+        "message": "User registered successfully", 
         "user": new_user.to_dict()
         }), 201
 
