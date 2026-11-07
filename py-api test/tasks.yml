@@ -1,0 +1,22 @@
+info:
+  name: tasks
+  type: http
+
+http:
+  method: POST
+  url: http://127.0.0.1:5000/api/v1/tasks
+  body:
+    type: json
+    data: |-
+      {
+        "title": "learning Python after Go"
+      }
+  auth:
+    type: bearer
+    token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc5NDAyODYyMywianRpIjoiNDVmYjIyYTEtMjYyNy00MDY3LWE5ZDgtZmY2ZGNjMzJjM2Y2IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjEiLCJuYmYiOjE3OTQwMjg2MjMsImNzcmYiOiI3MjJhOWFlMi04MzM4LTQ5YjctYmMwZi00M2UwNjY0N2EyYjAiLCJleHAiOjE3OTQwMjk1MjN9.OZl5s9uiLGsgfzgzBIfHIBl18QFfQq1SL_JcDGqGa_s
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

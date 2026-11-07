@@ -1,7 +1,7 @@
 # api/routes.py
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
-from api.models import db, User
+from api.models import db, User, Task
 
 # Create a Blueprint named 'api
 api_bp = Blueprint("api", __name__)
@@ -63,7 +63,39 @@ def get_profile():
         "user": user.to_dict()
     }), 200
 
+@api_bp.route("/tasks", methods=["GET"])
+@jwt_required()
+def get_user_tasks():
+    """Fetch only the tasks belonging to the currently logged in"""
+    current_user_id = get_jwt_identity()
 
+    # Query tasks filtered by the logged in users id
+    tasks = Task.query.filter_by(user_id=current_user_id).all()
+
+    return jsonify([task.to_dict() for task in tasks]), 200
+
+@api_bp.route("/tasks", methods=["POST"])
+@jwt_required()
+def create_task():
+    """Create a new task tied securely to the logged-in user"""
+    current_user_id = get_jwt_identity()
+    data = request.get_json()
+
+    if not data or not data.get("title"):
+        return jsonify({"error": "Missing task title"}), 400
+
+    new_task = Task(
+        title=data["title"],
+        user_id=current_user_id # bind task to token holder
+    )
+
+    db.session.add(new_task)
+    db.session.commit()
+
+    return jsonify({
+        "message": "Task created successfully",
+        "task": new_task.to_dict()
+    }), 201
         
 @api_bp.route("/users", methods=["GET"])
 def get_user():

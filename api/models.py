@@ -31,3 +31,19 @@ class User(db.Model):
             "email": self.email,
             "role": self.role
         }
+
+class Task(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(200), nullable=False)
+    done = db.Column(db.Boolean, default=False, nullable=False)
+
+    # Foreign Key linking this task to a specific User ID
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "title": self.title,
+            "done": self.done,
+            "user_id": self.user_id
+        }
