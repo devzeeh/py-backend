@@ -96,7 +96,57 @@ def create_task():
         "message": "Task created successfully",
         "task": new_task.to_dict()
     }), 201
-        
+
+@api_bp.route("/tasks/<int:task_id>", methods=["PUT"])
+@jwt_required()
+def update_task(task_id):
+    """Update a specific task (toggle 'done' status or change title)"""
+    current_user_id = get_jwt_identity()
+
+    # Fetch the task or return a 404 error if it doesn't exist
+    task = Task.query.get_or_404(task_id)
+
+    # SECURITY CHECK: Ensure the logged-in user owns this task
+    # Note: convert to string just in case JWT identity is stored as a string
+    if str(task.user_id) != str(current_user_id):
+        return jsonify({"error": "Unauthorized: You do not own this task"}), 403
+
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "Missing request body"}), 400
+
+    # Update fields if provided in the request
+    if "title" in data:
+        task.title = data["title"]
+    if "done" in data:
+        task.done = data["done"]
+
+    db.session.commit()
+
+    return jsonify({
+        "message": "Task updated successfully",
+        "task": task.to_dict()
+    }), 200
+
+@api_bp.route("/tasks/<int:task_id>", methods=["DELETE"])
+@jwt_required()
+def delete_task(task_id):
+    """Delete a specific task belonging to the logged-in user"""
+    current_user_id = get_jwt_identity()
+    
+    task = Task.query.get_or_404(task_id)
+
+    # SECURITY CHECK: Ensure ownership before deleting
+    if str(task.user_id) != str(current_user_id):
+        return jsonify({"error": "Unauthorized: You do not own this task"}), 403
+
+    db.session.delete(task)
+    db.session.commit()
+
+    return jsonify({
+        "message": "Task deleted successfully"
+    }), 200
+
 @api_bp.route("/users", methods=["GET"])
 def get_user():
     """Fetch all user from the database"""
