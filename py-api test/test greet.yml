@@ -1,0 +1,21 @@
+info:
+  name: test greet
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: http://127.0.0.1:5000/api/v1/greet
+  body:
+    type: json
+    data: |-
+      {
+        "name": "Junior Dev"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
