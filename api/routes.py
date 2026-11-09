@@ -3,7 +3,7 @@ from flask import Blueprint, jsonify, request
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from pydantic import ValidationError
 from api.models import db, User, Task
-from api.schemas import TaskCreateSchema, UserRegisterShema
+from api.schemas import TaskCreateSchema, UserRegisterShema, UserResponse
 
 # Create a Blueprint named 'api
 api_bp = Blueprint("api", __name__)
@@ -34,9 +34,12 @@ def register():
     db.session.add(new_user)
     db.session.commit()
 
+    # Serialize the user model through pydantic output schema
+    serialized_user = UserResponse.model_validate(new_user)
+
     return jsonify({
         "message": "User registered successfully", 
-        "user": new_user.to_dict()
+        "user": serialized_user.model_dump() # Convert pydantic model to a clean dictionary
         }), 201
 
 @api_bp.post("/login")
