@@ -1,23 +1,35 @@
 # api/routes.py
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
+from pydantic import ValidationError
 from api.models import db, User, Task
+from api.schemas import TaskCreateSchema, UserRegisterShema
 
 # Create a Blueprint named 'api
 api_bp = Blueprint("api", __name__)
 
 @api_bp.post("/register")
 def register():
-    data = request.get_json()
+    """Register a new user with pydantic valdidation"""
+    data = request.get_json() or {}
 
-    if not data or not data.get("name") or not data.get("email") or not data.get("password"):
-        return jsonify({"error": "Missing name, email, password"}), 400
+    try:
+        # Validate data against pydantic validation
+        validate_data = UserRegisterShema(**data)
+    except ValidationError as e:
+        return jsonify({
+            "error": "Validation error",
+            "details": e.errors()
+        }), 400
 
     if User.query.filter_by(email=data["email"]).first():
         return jsonify({"error": "Email already registered"}), 400
 
-    new_user = User(name=data["name"], email=data["email"])
-    new_user.set_password(data["password"]) # securely hash password
+    new_user = User(
+        name=validate_data.name,
+        email=validate_data.email
+    )
+    new_user.set_password(validate_data.password) # securely hash password
 
     db.session.add(new_user)
     db.session.commit()
@@ -109,13 +121,18 @@ def get_user_tasks():
 def create_task():
     """Create a new task tied securely to the logged-in user"""
     current_user_id = get_jwt_identity()
-    data = request.get_json()
+    data = request.get_json() or {}
 
-    if not data or not data.get("title"):
-        return jsonify({"error": "Missing task title"}), 400
+    try:
+        validated_data = TaskCreateSchema(**data)
+    except ValidationError as e:
+        return jsonify({
+            "error": "Validation error",
+            "details": e.errors()
+        }), 400
 
     new_task = Task(
-        title=data["title"],
+        title=validated_data.title,
         user_id=current_user_id # bind task to token holder
     )
 
