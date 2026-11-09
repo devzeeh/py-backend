@@ -1,11 +1,13 @@
 import os
 from flask import Flask, jsonify
 from flask_jwt_extended import JWTManager
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 from flask_migrate import Migrate
 from dotenv import load_dotenv
-from api.models import db
-from api.routes import api_bp
 from config import config_by_name
+from extensions import db, jwt, migrate, limiter
+from api.routes import api_bp
 
 # Load enviroment variables from .env files
 load_dotenv()
@@ -26,6 +28,8 @@ def create_app(config_name=None):
     jwt = JWTManager(app) # Initialize JWT manager
     # Initialize Flask-Migrate
     migrate = Migrate(app, db)
+    # Connect limiter to the Flask app instance
+    limiter.init_app(app)
 
     # Create database tables automatically if they don't exist
     with app.app_context():

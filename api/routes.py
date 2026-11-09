@@ -4,11 +4,13 @@ from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identi
 from pydantic import ValidationError
 from api.models import db, User, Task
 from api.schemas import TaskCreateSchema, UserRegisterShema, UserResponse
+from extensions import limiter
 
 # Create a Blueprint named 'api
 api_bp = Blueprint("api", __name__)
 
 @api_bp.post("/register")
+@limiter.limit("5 per minute") # Allow 5 attempt per minute /IP
 def register():
     """Register a new user with pydantic valdidation"""
     data = request.get_json() or {}
@@ -80,6 +82,7 @@ def get_profile():
 
 @api_bp.get("/tasks")
 @jwt_required()
+@limiter.limit("30 per minute")
 def get_user_tasks():
     """Fetch only the tasks belonging to the currently logged in"""
     current_user_id = get_jwt_identity()
