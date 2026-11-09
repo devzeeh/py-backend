@@ -5,19 +5,21 @@ from flask_migrate import Migrate
 from dotenv import load_dotenv
 from api.models import db
 from api.routes import api_bp
+from config import config_by_name
 
 # Load enviroment variables from .env files
 load_dotenv()
 
-def create_app():
+def create_app(config_name=None):
     # initialize the Flask application
     app = Flask(__name__)
 
-    # Configure SQLite database file stored locally
-    # configurations securely from environment variables with safe fallbacks
-    app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("SQLALCHEMY_DATABASE_URI")
-    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-    app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY", "fallback-secret-key")
+    # Determine which config to use (default to 'development')
+    if not config_name:
+        config_name = os.getenv("FlASK_ENV")
+    
+    # Load the corresponding configuration class
+    app.config.from_object(config_by_name[config_name])
 
     # Initialize extensions with the app
     db.init_app(app)
