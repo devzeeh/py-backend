@@ -6,7 +6,7 @@ from api.models import db, User, Task
 # Create a Blueprint named 'api
 api_bp = Blueprint("api", __name__)
 
-@api_bp.route("/register", methods=["POST"])
+@api_bp.post("/register")
 def register():
     data = request.get_json()
 
@@ -27,7 +27,7 @@ def register():
         "user": new_user.to_dict()
         }), 201
 
-@api_bp.route("/login", methods=["POST"])
+@api_bp.post("/login")
 def login():
     data = request.get_json()
 
@@ -48,7 +48,7 @@ def login():
         "access_token": access_token
     }), 200
 
-@api_bp.route("/profile", methods=["GET"])
+@api_bp.get("/profile")
 @jwt_required() # This decorator forces the client to send a valid token!
 def get_profile():
     # Get the user ID stored inside the JWT token
@@ -63,7 +63,7 @@ def get_profile():
         "user": user.to_dict()
     }), 200
 
-@api_bp.route("/tasks", methods=["GET"])
+@api_bp.get("/tasks")
 @jwt_required()
 def get_user_tasks():
     """Fetch only the tasks belonging to the currently logged in"""
@@ -104,7 +104,7 @@ def get_user_tasks():
         }
     }), 200
 
-@api_bp.route("/tasks", methods=["POST"])
+@api_bp.post("/tasks")
 @jwt_required()
 def create_task():
     """Create a new task tied securely to the logged-in user"""
@@ -127,7 +127,7 @@ def create_task():
         "task": new_task.to_dict()
     }), 201
 
-@api_bp.route("/tasks/<int:task_id>", methods=["PUT"])
+@api_bp.put("/tasks/<int:task_id>")
 @jwt_required()
 def update_task(task_id):
     """Update a specific task (toggle 'done' status or change title)"""
@@ -158,7 +158,7 @@ def update_task(task_id):
         "task": task.to_dict()
     }), 200
 
-@api_bp.route("/tasks/<int:task_id>", methods=["DELETE"])
+@api_bp.delete("/tasks/<int:task_id>")
 @jwt_required()
 def delete_task(task_id):
     """Delete a specific task belonging to the logged-in user"""
@@ -176,13 +176,13 @@ def delete_task(task_id):
 
     return jsonify({"message": "Task deleted successfully"}), 200
 
-@api_bp.route("/users", methods=["GET"])
+@api_bp.get("/users")
 def get_user():
     """Fetch all user from the database"""
     users = User.query.all()
     return jsonify([user.to_dict() for user in users]), 200 
 
-@api_bp.route("/users", methods=["POST"])
+@api_bp.post("/users")
 def create_user():
         """Save a new user to the database"""
         data = request.get_json()
@@ -208,7 +208,7 @@ def create_user():
         }), 201
 
 
-@api_bp.route("/greet", methods=["POST"])
+@api_bp.post("/greet")
 def greet_user():
     data = request.get_json()
 
