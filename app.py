@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 from config import config_by_name
 from extensions import db, jwt, migrate, limiter
 from api.routes import api_bp
+from api.errors import register_error_handlers
 
 # Load enviroment variables from .env files
 load_dotenv()
@@ -30,6 +31,8 @@ def create_app(config_name=None):
     migrate = Migrate(app, db)
     # Connect limiter to the Flask app instance
     limiter.init_app(app)
+
+    register_error_handlers(app)
 
     # Create database tables automatically if they don't exist
     with app.app_context():
